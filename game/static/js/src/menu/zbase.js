@@ -51,38 +51,4 @@ class Menu {
     hide() { // 隐藏 menu 界面
         this.$menu.hide();
     }
-}class Playground {
-    constructor(root) {
-        this.root = root;
-        this.$playground = $(`<div>playground</div>`);
-        this.hide();
-        this.root.$game.append(this.$playground);
-
-        this.start();
-    }
-
-    start() {
-
-    }
-
-    show() { // 显示 playground 界面
-        this.$playground.show();
-    }
-
-    hide() { // 隐藏 playground 界面
-        this.$playground.hide();
-    }
-}class Game {
-    constructor(id) {
-        this.id = id;
-        this.$game = $('#' + id);
-        this.menu = new Menu(this);
-        this.playground = new Playground(this);
-
-        this.start();
-    }
-
-    start() {
-        
-    }
 }

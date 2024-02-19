@@ -1,0 +1,33 @@
+.game-menu {
+    background-image: url("/static/image/menu/background.gif");
+    height: 100%;
+    width: 100%;
+    background-size: 100% 100%;
+    user-select: none;
+}
+
+.game-menu-box {
+    width: 20vw;
+    position: relative;
+    top: 40vh;
+    left: 20vw;
+}
+
+.game-menu-box-item {
+    background-color: rgba(30, 30, 30, 0.5);
+    height: 6vh;
+    width: 18vw;
+    color: wheat;
+    font-size: 6vh;
+    font-style: italic;
+    padding: 2vh;
+    text-align: center;
+    border-radius: 10px;
+    letter-spacing: 0.5vw;
+    cursor: pointer;
+}
+
+.game-menu-box-item:hover {
+    transform: scale(1.2);
+    transition: 200ms;
+}
