@@ -18,11 +18,12 @@ class Menu {
             </div>
         </div>
         `);
+        this.hide();
         this.root.$game.append(this.$menu);
         this.$sing_mode = this.$menu.find(".game-menu-box-item-sing_mode");
         this.$multi_mode = this.$menu.find(".game-menu-box-item-multi_mode");
         this.$settings = this.$menu.find(".game-menu-box-item-settings");
-    
+
         this.start();
     }
 
