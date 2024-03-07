@@ -13,7 +13,7 @@ class Menu {
                 </div>
                 <br>
                 <div class="game-menu-box-item game-menu-box-item-settings">
-                    设置
+                    退出
                 </div>
             </div>
         </div>
@@ -41,7 +41,7 @@ class Menu {
             console.log("multi_mode");
         });
         this.$settings.click(function() {
-            console.log("settings");
+            that.root.settings.logout_on_remote();
         });
     }
 

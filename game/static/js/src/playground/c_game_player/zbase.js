@@ -22,6 +22,11 @@ class GamePlayer extends GameObject {
         this.friction = 0.9;
 
         this.protection_time = 0;
+
+        if (this.is_me) {
+            this.img = new Image();
+            this.img.src = this.playground.root.settings.photo;
+        }
     }
 
     start() {
@@ -143,10 +148,20 @@ class GamePlayer extends GameObject {
     }
 
     render() {
-        this.context.beginPath();
-        this.context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
-        this.context.fillStyle = this.color;
-        this.context.fill();
+        if (this.is_me) {
+            this.context.save();
+            this.context.beginPath();
+            this.context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+            this.context.stroke();
+            this.context.clip();
+            this.context.drawImage(this.img, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2); 
+            this.context.restore();
+        } else {
+            this.context.beginPath();
+            this.context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+            this.context.fillStyle = this.color;
+            this.context.fill();
+        }
     }
 
     on_destroy() {

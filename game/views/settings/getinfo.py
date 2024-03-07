@@ -10,12 +10,18 @@ def getinfo_acapp(request):
     })
 
 def getinfo_web(request):
-    player = Player.objects.all()[0]
-    return JsonResponse({
-        "result": "success",
-        "username": player.user.username,
-        "photo": player.photo
-    })
+    user = request.user
+    if not user.is_authenticated:
+        return JsonResponse({
+            "result": "unauthenticated"
+        })
+    else:
+        player = Player.objects.get(user = user)
+        return JsonResponse({
+            "result": "success",
+            "username": player.user.username,
+            "photo": player.photo
+        })
 
 def getinfo(request):
     platform = request.GET.get("platform")

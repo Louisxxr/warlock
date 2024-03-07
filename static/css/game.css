@@ -36,3 +36,121 @@
     width: 100%;
     user-select: none;
 }
+
+.game-settings {
+    background-image: url("/static/image/menu/background.gif");
+    height: 100%;
+    width: 100%;
+    background-size: 100% 100%;
+    user-select: none;
+}
+
+.game-settings-login {
+    height: 45vh;
+    width: 30vw;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 5px;
+}
+
+.game-settings-register {
+    height: 52vh;
+    width: 30vw;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 5px;
+}
+
+.game-settings-title {
+    color: white;
+    font-size: 3vh;
+    text-align: center;
+    padding-top: 2vh;
+    margin-bottom: 2vh;
+}
+
+.game-settings-username {
+    display: block;
+    height: 7vh;
+}
+
+.game-settings-password {
+    display: block;
+    height: 7vh;
+}
+
+.game-settings-submit {
+    display: block;
+    height: 7vh;
+}
+
+.game-settings-errormessages {
+    color: red;
+    font-size: 1.5vh;
+    display: inline;
+    float: left;
+    padding-left: 1.5vw;
+}
+
+.game-settings-option {
+    color: white;
+    font-size: 2vh;
+    display: inline;
+    float: right;
+    padding-right: 1.5vw;
+    cursor: pointer;
+}
+
+.game-settings-acwing {
+    display: block;
+    height: 7vh;
+}
+
+.game-settings-acwing > img {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    display: block;
+}
+
+.game-settings-acwing > div {
+    color: white;
+    font-size: 2vh;
+    text-align: center;
+    display: block;
+}
+
+.game-settings-item {
+    height: 100%;
+    width: 100%;
+}
+
+.game-settings-item > input {
+    width: 90%;
+    line-height: 3vh;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.game-settings-item > button {
+    color: black;
+    background-color: white;
+    width: 90%;
+    line-height: 3vh;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 5px;
+    cursor: pointer;
+}
