@@ -546,6 +546,8 @@ requestAnimationFrame(GAME_ANIMATION);class GameMap extends GameObject {
         this.$register_errormessages = this.$register.find(".game-settings-errormessages");
         this.$register_login = this.$register.find(".game-settings-option");
 
+        this.$acwing_login = this.$settings.find(".game-settings-acwing img");
+
         this.$login.hide();
         this.$register.hide();
 
@@ -560,6 +562,11 @@ requestAnimationFrame(GAME_ANIMATION);class GameMap extends GameObject {
     add_listening_events() {
         this.add_listening_events_login();
         this.add_listening_events_register();
+
+        let that = this;
+        this.$acwing_login.click(function() {
+            that.acwing_login();
+        })
     }
 
     add_listening_events_login() {
@@ -684,6 +691,18 @@ requestAnimationFrame(GAME_ANIMATION);class GameMap extends GameObject {
                 }
             }
         })
+    }
+
+    acwing_login() {
+        $.ajax({
+            url: "https://app6621.acapp.acwing.com.cn/settings/oauth/acwing_web/apply_code",
+            type: "GET",
+            success: function(resp) {
+                if (resp.result === "success") {
+                    window.location.replace(resp.apply_code_url);
+                }
+            }
+        });
     }
 }export class Game {
     constructor(id, acos) {
