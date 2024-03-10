@@ -106,8 +106,12 @@ class Settings {
     }
 
     start() {
-        this.getinfo();
-        this.add_listening_events();
+        if (this.platform === "web") {
+            this.getinfo_web();
+            this.add_listening_events();
+        } else {
+            this.getinfo_acapp();
+        }
     }
 
     add_listening_events() {
@@ -140,7 +144,7 @@ class Settings {
         })
     }
 
-    getinfo() {
+    getinfo_web() {
         let that = this;
         $.ajax({
             url: "https://app6621.acapp.acwing.com.cn/settings/getinfo/",
@@ -157,6 +161,31 @@ class Settings {
                 } else {
                     that.login();
                 }
+            }
+        });
+    }
+
+    getinfo_acapp() {
+        let that = this;
+        $.ajax({
+            url: "https://app6621.acapp.acwing.com.cn/settings/oauth/acwing_acapp/apply_code/",
+            type: "GET",
+            success: function(resp) {
+                if (resp.result === "success") {
+                    that.acapp_login(resp.appid, resp.redirect_uri, resp.scope, resp.state);
+                }
+            }
+        })
+    }
+
+    acapp_login(appid, redirect_uri, scope, state) {
+        let that = this;
+        this.root.acos.api.oauth2.authorize(appid, redirect_uri, scope, state, function(resp) {
+            if (resp.result === "success") {
+                that.username = resp.username,
+                that.photo = resp.photo,
+                that.hide();
+                that.root.menu.show();
             }
         });
     }
