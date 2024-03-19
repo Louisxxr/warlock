@@ -12,7 +12,7 @@ class GamePlayer extends GameObject {
         this.move_dist = 0;
         this.vx = 0;
         this.vy = 0;
-        this.eps = 0.1;
+        this.eps = 0.01;
 
         this.holding_skill = null;
 
@@ -33,8 +33,8 @@ class GamePlayer extends GameObject {
         if (this.is_me) {
             this.add_listening_events();
         } else {
-            let tx = Math.random() * this.playground.width;
-            let ty = Math.random() * this.playground.height;
+            let tx = Math.random() * this.playground.width / this.playground.scale;
+            let ty = Math.random() * this.playground.height / this.playground.scale;
             this.move_to(tx, ty);
         }
     }
@@ -44,10 +44,10 @@ class GamePlayer extends GameObject {
         this.playground.map.$canvas.mousedown(function(e) {
             const rect = that.context.canvas.getBoundingClientRect();
             if (e.which === 3) {
-                that.move_to(e.clientX - rect.left, e.clientY - rect.top);
+                that.move_to((e.clientX - rect.left) / that.playground.scale, (e.clientY - rect.top) / that.playground.scale);
             } else if (e.which === 1) {
                 if (that.holding_skill === "fireball") {
-                    that.shoot_fireball(e.clientX - rect.left, e.clientY - rect.top);
+                    that.shoot_fireball((e.clientX - rect.left) / that.playground.scale, (e.clientY - rect.top) / that.playground.scale);
                 }
                 that.holding_skill = null;
             }
@@ -77,17 +77,22 @@ class GamePlayer extends GameObject {
     shoot_fireball(tx, ty) {
         let x = this.x;
         let y = this.y;
-        let radius = 0.01 * this.playground.height;
+        let radius = 0.01;
         let color = "orange";
-        let speed = 0.6 * this.playground.height;
-        let move_dist = 1 * this.playground.height;
+        let speed = 0.6;
+        let move_dist = 1;
         let angle = Math.atan2(ty - this.y, tx - this.x);
         let vx = Math.cos(angle), vy = Math.sin(angle);
-        let damage = 0.01 * this.playground.height; // 每次击中造成 20% 伤害
+        let damage = 0.01; // 每次击中造成 20% 伤害
         new FireBall(this.playground, this, x, y, radius, color, speed, move_dist, vx, vy, damage);
     }
 
     update() {
+        this.update_move();
+        this.render();
+    }
+
+    update_move() {
         this.protection_time += this.time_diff / 1000;
         if (!this.is_me && this.protection_time > 4 && Math.random() < 1 / 300.0) {
             let player = this.playground.players[Math.floor(Math.random() * this.playground.players.length)];
@@ -102,13 +107,13 @@ class GamePlayer extends GameObject {
             this.y += this.damage_vy * this.damage_speed * this.time_diff / 1000;
             this.damage_speed *= this.friction;
         } else {
-            if (this.move_dist < 10) {
+            if (this.move_dist < this.eps) {
                 this.move_dist = 0;
                 this.vx = 0;
                 this.vy = 0;
                 if (!this.is_me) {
-                    let tx = Math.random() * this.playground.width;
-                    let ty = Math.random() * this.playground.height;
+                    let tx = Math.random() * this.playground.width / this.playground.scale;
+                    let ty = Math.random() * this.playground.height / this.playground.scale;
                     this.move_to(tx, ty);
                 }
             } else {
@@ -118,8 +123,6 @@ class GamePlayer extends GameObject {
                 this.move_dist -= moved;
             }
         }
-
-        this.render();
     }
 
     is_attacked(angle, damage) {
@@ -137,7 +140,7 @@ class GamePlayer extends GameObject {
         }
 
         this.radius -= damage;
-        if (this.radius < 10) {
+        if (this.radius < this.eps) {
             this.destroy();
             return false;
         }
@@ -148,17 +151,18 @@ class GamePlayer extends GameObject {
     }
 
     render() {
+        let scale = this.playground.scale;
         if (this.is_me) {
             this.context.save();
             this.context.beginPath();
-            this.context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+            this.context.arc(this.x * scale, this.y * scale, this.radius * scale, 0, 2 * Math.PI, false);
             this.context.stroke();
             this.context.clip();
-            this.context.drawImage(this.img, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2); 
+            this.context.drawImage(this.img, (this.x - this.radius) * scale, (this.y - this.radius) * scale, this.radius * 2 * scale, this.radius * 2 * scale); 
             this.context.restore();
         } else {
             this.context.beginPath();
-            this.context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+            this.context.arc(this.x * scale, this.y * scale, this.radius * scale, 0, 2 * Math.PI, false);
             this.context.fillStyle = this.color;
             this.context.fill();
         }

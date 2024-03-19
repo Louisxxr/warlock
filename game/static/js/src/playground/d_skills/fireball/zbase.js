@@ -13,7 +13,7 @@ class FireBall extends GameObject {
         this.vx = vx;
         this.vy = vy;
         this.damage = damage;
-        this.eps = 0.1;
+        this.eps = 0.01;
     }
 
     start() {
@@ -60,8 +60,9 @@ class FireBall extends GameObject {
     }
 
     render() {
+        let scale = this.playground.scale;
         this.context.beginPath();
-        this.context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+        this.context.arc(this.x * scale, this.y * scale, this.radius * scale, 0, 2 * Math.PI, false);
         this.context.fillStyle = this.color;
         this.context.fill();
     }

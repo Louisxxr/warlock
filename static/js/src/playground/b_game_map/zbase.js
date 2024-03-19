@@ -15,6 +15,13 @@ class GameMap extends GameObject {
         });
     }
 
+    resize() {
+        this.context.canvas.height = this.playground.height;
+        this.context.canvas.width = this.playground.width;
+        this.context.fillStyle = "rgba(0, 0, 0, 1)";
+        this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height, 0.2 * this.height, true);
+    }
+
     update() {
         this.render();
     }

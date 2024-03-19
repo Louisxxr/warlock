@@ -12,7 +12,7 @@ class Particle extends GameObject {
         this.vx = vx;
         this.vy = vy;
         this.friction = 0.9;
-        this.eps = 1;
+        this.eps = 0.01;
     }
 
     start() {
@@ -33,8 +33,9 @@ class Particle extends GameObject {
     }
 
     render() {
+        let scale = this.playground.scale;
         this.context.beginPath();
-        this.context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+        this.context.arc(this.x * scale, this.y * scale, this.radius * scale, 0, 2 * Math.PI, false);
         this.context.fillStyle = this.color;
         this.context.fill();
     }

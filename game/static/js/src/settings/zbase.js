@@ -158,6 +158,7 @@ class Settings {
                     that.photo = resp.photo;
                     that.hide();
                     that.root.menu.show();
+                    console.log(that.username);
                 } else {
                     that.login();
                 }
@@ -186,6 +187,7 @@ class Settings {
                 that.photo = resp.photo,
                 that.hide();
                 that.root.menu.show();
+                console.log(that.username);
             }
         });
     }
