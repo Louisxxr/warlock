@@ -35,10 +35,11 @@ class Menu {
         let that = this;
         this.$sing_mode.click(function() {
             that.hide();
-            that.root.playground.show();
+            that.root.playground.show("sing_mode");
         });
         this.$multi_mode.click(function() {
-            console.log("multi_mode");
+            that.hide();
+            that.root.playground.show("multi_mode");
         });
         this.$settings.click(function() {
             that.root.settings.logout_on_remote();

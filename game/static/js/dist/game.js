@@ -35,10 +35,11 @@ class Menu {
         let that = this;
         this.$sing_mode.click(function() {
             that.hide();
-            that.root.playground.show();
+            that.root.playground.show("sing_mode");
         });
         this.$multi_mode.click(function() {
-            console.log("multi_mode");
+            that.hide();
+            that.root.playground.show("multi_mode");
         });
         this.$settings.click(function() {
             that.root.settings.logout_on_remote();
@@ -136,7 +137,7 @@ requestAnimationFrame(GAME_ANIMATION);class GameMap extends GameObject {
         this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height, 0.2 * this.height, true);
     }
 }class GamePlayer extends GameObject {
-    constructor(playground, x, y, radius, color, speed, is_me) {
+    constructor(playground, x, y, radius, color, speed, character, username, photo) {
         super();
         this.playground = playground;
         this.context = this.playground.map.context;
@@ -145,7 +146,9 @@ requestAnimationFrame(GAME_ANIMATION);class GameMap extends GameObject {
         this.radius = radius;
         this.color = color;
         this.speed = speed; // 1 秒移动的距离
-        this.is_me = is_me;
+        this.character = character;
+        this.username = username;
+        this.photo = photo;
         this.move_dist = 0;
         this.vx = 0;
         this.vy = 0;
@@ -160,14 +163,14 @@ requestAnimationFrame(GAME_ANIMATION);class GameMap extends GameObject {
 
         this.protection_time = 0;
 
-        if (this.is_me) {
+        if (this.character !== "robot") {
             this.img = new Image();
             this.img.src = this.playground.root.settings.photo;
         }
     }
 
     start() {
-        if (this.is_me) {
+        if (this.character === "me") {
             this.add_listening_events();
         } else {
             let tx = Math.random() * this.playground.width / this.playground.scale;
@@ -231,7 +234,7 @@ requestAnimationFrame(GAME_ANIMATION);class GameMap extends GameObject {
 
     update_move() {
         this.protection_time += this.time_diff / 1000;
-        if (!this.is_me && this.protection_time > 4 && Math.random() < 1 / 300.0) {
+        if (!this.character === "robot" && this.protection_time > 4 && Math.random() < 1 / 300.0) {
             let player = this.playground.players[Math.floor(Math.random() * this.playground.players.length)];
             let tx = player.x + player.vx * player.speed * player.time_diff / 1000 * 1; // 预判：射击 1s 后的位置
             let ty = player.y + player.vy * player.speed * player.time_diff / 1000 * 1;
@@ -248,7 +251,7 @@ requestAnimationFrame(GAME_ANIMATION);class GameMap extends GameObject {
                 this.move_dist = 0;
                 this.vx = 0;
                 this.vy = 0;
-                if (!this.is_me) {
+                if (this.character === "robot") {
                     let tx = Math.random() * this.playground.width / this.playground.scale;
                     let ty = Math.random() * this.playground.height / this.playground.scale;
                     this.move_to(tx, ty);
@@ -289,7 +292,7 @@ requestAnimationFrame(GAME_ANIMATION);class GameMap extends GameObject {
 
     render() {
         let scale = this.playground.scale;
-        if (this.is_me) {
+        if (this.character !== "robot") {
             this.context.save();
             this.context.beginPath();
             this.context.arc(this.x * scale, this.y * scale, this.radius * scale, 0, 2 * Math.PI, false);
@@ -421,6 +424,25 @@ requestAnimationFrame(GAME_ANIMATION);class GameMap extends GameObject {
         this.context.fillStyle = this.color;
         this.context.fill();
     }
+}class MultiPlayerSocket {
+    constructor(playground) {
+        this.playground = playground;
+        this.ws = new WebSocket("wss://app6621.acapp.acwing.com.cn/wss/multi_mode/");
+
+        this.start();
+    }
+
+    start() {
+    }
+
+    send_create_player() {
+        this.ws.send(JSON.stringify({
+            "message": "hello, server"
+        }))
+    }
+
+    receive_create_player() {
+    }
 }class Playground {
     constructor(root) {
         this.root = root;
@@ -454,17 +476,25 @@ requestAnimationFrame(GAME_ANIMATION);class GameMap extends GameObject {
         }
     }
 
-    show() { // 显示 playground 界面
-        this.resize();
+    show(mode) { // 显示 playground 界面
+        let that = this;
         this.$playground.show();
         this.height = this.$playground.height();
         this.width = this.$playground.width();
         this.map = new GameMap(this);
+        this.resize();
         this.players = [];
-        this.players.push(new GamePlayer(this, this.width / 2 / this.scale, 0.5, 0.05, "white", 0.2, true));
+        this.players.push(new GamePlayer(this, this.width / 2 / this.scale, 0.5, 0.05, "white", 0.2, "me", this.root.settings.username, this.root.settings.photo));
 
-        for (let i = 0; i < 5; i++) {
-            this.players.push(new GamePlayer(this, this.width / 2 / this.scale, 0.5, 0.05, this.get_random_color(), 0.2, false));
+        if (mode === "sing_mode") {
+            for (let i = 0; i < 5; i++) {
+                this.players.push(new GamePlayer(this, this.width / 2 / this.scale, 0.5, 0.05, this.get_random_color(), 0.2, "robot"));
+            }
+        } else if (mode === "multi_mode") {
+            this.socket = new MultiPlayerSocket(this);
+            this.socket.ws.onopen = function() {
+                that.socket.send_create_player();
+            }
         }
     }
 

@@ -1,5 +1,5 @@
 class GamePlayer extends GameObject {
-    constructor(playground, x, y, radius, color, speed, is_me) {
+    constructor(playground, x, y, radius, color, speed, character, username, photo) {
         super();
         this.playground = playground;
         this.context = this.playground.map.context;
@@ -8,7 +8,9 @@ class GamePlayer extends GameObject {
         this.radius = radius;
         this.color = color;
         this.speed = speed; // 1 秒移动的距离
-        this.is_me = is_me;
+        this.character = character;
+        this.username = username;
+        this.photo = photo;
         this.move_dist = 0;
         this.vx = 0;
         this.vy = 0;
@@ -23,14 +25,14 @@ class GamePlayer extends GameObject {
 
         this.protection_time = 0;
 
-        if (this.is_me) {
+        if (this.character !== "robot") {
             this.img = new Image();
             this.img.src = this.playground.root.settings.photo;
         }
     }
 
     start() {
-        if (this.is_me) {
+        if (this.character === "me") {
             this.add_listening_events();
         } else {
             let tx = Math.random() * this.playground.width / this.playground.scale;
@@ -94,7 +96,7 @@ class GamePlayer extends GameObject {
 
     update_move() {
         this.protection_time += this.time_diff / 1000;
-        if (!this.is_me && this.protection_time > 4 && Math.random() < 1 / 300.0) {
+        if (!this.character === "robot" && this.protection_time > 4 && Math.random() < 1 / 300.0) {
             let player = this.playground.players[Math.floor(Math.random() * this.playground.players.length)];
             let tx = player.x + player.vx * player.speed * player.time_diff / 1000 * 1; // 预判：射击 1s 后的位置
             let ty = player.y + player.vy * player.speed * player.time_diff / 1000 * 1;
@@ -111,7 +113,7 @@ class GamePlayer extends GameObject {
                 this.move_dist = 0;
                 this.vx = 0;
                 this.vy = 0;
-                if (!this.is_me) {
+                if (this.character === "robot") {
                     let tx = Math.random() * this.playground.width / this.playground.scale;
                     let ty = Math.random() * this.playground.height / this.playground.scale;
                     this.move_to(tx, ty);
@@ -152,7 +154,7 @@ class GamePlayer extends GameObject {
 
     render() {
         let scale = this.playground.scale;
-        if (this.is_me) {
+        if (this.character !== "robot") {
             this.context.save();
             this.context.beginPath();
             this.context.arc(this.x * scale, this.y * scale, this.radius * scale, 0, 2 * Math.PI, false);

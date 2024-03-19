@@ -31,17 +31,25 @@ class Playground {
         }
     }
 
-    show() { // 显示 playground 界面
-        this.resize();
+    show(mode) { // 显示 playground 界面
+        let that = this;
         this.$playground.show();
         this.height = this.$playground.height();
         this.width = this.$playground.width();
         this.map = new GameMap(this);
+        this.resize();
         this.players = [];
-        this.players.push(new GamePlayer(this, this.width / 2 / this.scale, 0.5, 0.05, "white", 0.2, true));
+        this.players.push(new GamePlayer(this, this.width / 2 / this.scale, 0.5, 0.05, "white", 0.2, "me", this.root.settings.username, this.root.settings.photo));
 
-        for (let i = 0; i < 5; i++) {
-            this.players.push(new GamePlayer(this, this.width / 2 / this.scale, 0.5, 0.05, this.get_random_color(), 0.2, false));
+        if (mode === "sing_mode") {
+            for (let i = 0; i < 5; i++) {
+                this.players.push(new GamePlayer(this, this.width / 2 / this.scale, 0.5, 0.05, this.get_random_color(), 0.2, "robot"));
+            }
+        } else if (mode === "multi_mode") {
+            this.socket = new MultiPlayerSocket(this);
+            this.socket.ws.onopen = function() {
+                that.socket.send_create_player();
+            }
         }
     }
 
