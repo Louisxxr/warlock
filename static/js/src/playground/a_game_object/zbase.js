@@ -6,6 +6,17 @@ class GameObject {
 
         this.has_init = false;
         this.time_diff = 0; // 本帧与上一帧的时间间隔（用于计算速度，单位：ms）
+    
+        this.id = this.create_id();
+    }
+
+    create_id() {
+        let id = ""
+        for (let i = 0; i < 8; i++) {
+            let x = parseInt(Math.floor(Math.random() * 10));
+            id += x;
+        }
+        return id;
     }
 
     start() { // 在第一帧执行（初始化）

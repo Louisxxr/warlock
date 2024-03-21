@@ -47,8 +47,9 @@ class Playground {
             }
         } else if (mode === "multi_mode") {
             this.socket = new MultiPlayerSocket(this);
+            this.socket.uuid = this.players[0].id;
             this.socket.ws.onopen = function() {
-                that.socket.send_create_player();
+                that.socket.send_create_player(that.root.settings.username, that.root.settings.photo);
             }
         }
     }

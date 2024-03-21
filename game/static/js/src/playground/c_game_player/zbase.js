@@ -27,14 +27,14 @@ class GamePlayer extends GameObject {
 
         if (this.character !== "robot") {
             this.img = new Image();
-            this.img.src = this.playground.root.settings.photo;
+            this.img.src = this.photo;
         }
     }
 
     start() {
         if (this.character === "me") {
             this.add_listening_events();
-        } else {
+        } else if (this.character === "robot") {
             let tx = Math.random() * this.playground.width / this.playground.scale;
             let ty = Math.random() * this.playground.height / this.playground.scale;
             this.move_to(tx, ty);
@@ -96,7 +96,7 @@ class GamePlayer extends GameObject {
 
     update_move() {
         this.protection_time += this.time_diff / 1000;
-        if (!this.character === "robot" && this.protection_time > 4 && Math.random() < 1 / 300.0) {
+        if (this.character === "robot" && this.protection_time > 4 && Math.random() < 1 / 300.0) {
             let player = this.playground.players[Math.floor(Math.random() * this.playground.players.length)];
             let tx = player.x + player.vx * player.speed * player.time_diff / 1000 * 1; // 预判：射击 1s 后的位置
             let ty = player.y + player.vy * player.speed * player.time_diff / 1000 * 1;

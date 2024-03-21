@@ -61,6 +61,17 @@ class GameObject {
 
         this.has_init = false;
         this.time_diff = 0; // 本帧与上一帧的时间间隔（用于计算速度，单位：ms）
+    
+        this.id = this.create_id();
+    }
+
+    create_id() {
+        let id = ""
+        for (let i = 0; i < 8; i++) {
+            let x = parseInt(Math.floor(Math.random() * 10));
+            id += x;
+        }
+        return id;
     }
 
     start() { // 在第一帧执行（初始化）
@@ -165,14 +176,14 @@ requestAnimationFrame(GAME_ANIMATION);class GameMap extends GameObject {
 
         if (this.character !== "robot") {
             this.img = new Image();
-            this.img.src = this.playground.root.settings.photo;
+            this.img.src = this.photo;
         }
     }
 
     start() {
         if (this.character === "me") {
             this.add_listening_events();
-        } else {
+        } else if (this.character === "robot") {
             let tx = Math.random() * this.playground.width / this.playground.scale;
             let ty = Math.random() * this.playground.height / this.playground.scale;
             this.move_to(tx, ty);
@@ -234,7 +245,7 @@ requestAnimationFrame(GAME_ANIMATION);class GameMap extends GameObject {
 
     update_move() {
         this.protection_time += this.time_diff / 1000;
-        if (!this.character === "robot" && this.protection_time > 4 && Math.random() < 1 / 300.0) {
+        if (this.character === "robot" && this.protection_time > 4 && Math.random() < 1 / 300.0) {
             let player = this.playground.players[Math.floor(Math.random() * this.playground.players.length)];
             let tx = player.x + player.vx * player.speed * player.time_diff / 1000 * 1; // 预判：射击 1s 后的位置
             let ty = player.y + player.vy * player.speed * player.time_diff / 1000 * 1;
@@ -433,15 +444,38 @@ requestAnimationFrame(GAME_ANIMATION);class GameMap extends GameObject {
     }
 
     start() {
+        this.receive();
     }
 
-    send_create_player() {
+    receive() {
+        let that = this;
+        this.ws.onmessage = function(e) {
+            let data = JSON.parse(e.data);
+            let uuid = data.uuid;
+            if (uuid === that.uuid) {
+                return false;
+            }
+            let event = data.event;
+            if (event === "create_player") {
+                that.receive_create_player(uuid, data.username, data.photo);
+            }
+        };
+    }
+
+    send_create_player(username, photo) {
+        let that = this;
         this.ws.send(JSON.stringify({
-            "message": "hello, server"
+            "event": "create_player",
+            "uuid": that.uuid,
+            "username": username,
+            "photo": photo
         }))
     }
 
-    receive_create_player() {
+    receive_create_player(uuid, username, photo) {
+        let player = new GamePlayer(this.playground, this.playground.width / 2 / this.playground.scale, 0.5, 0.05, "white", 0.2, "enemy", username, photo);
+        player.id = uuid;
+        this.playground.players.push(player);
     }
 }class Playground {
     constructor(root) {
@@ -492,8 +526,9 @@ requestAnimationFrame(GAME_ANIMATION);class GameMap extends GameObject {
             }
         } else if (mode === "multi_mode") {
             this.socket = new MultiPlayerSocket(this);
+            this.socket.uuid = this.players[0].id;
             this.socket.ws.onopen = function() {
-                that.socket.send_create_player();
+                that.socket.send_create_player(that.root.settings.username, that.root.settings.photo);
             }
         }
     }
