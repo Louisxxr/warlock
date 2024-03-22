@@ -235,19 +235,19 @@ class Settings {
 
     logout_on_remote() {
         if (this.platform === "acapp") {
-            return false;
-        }
-
-        let that = this;
-        $.ajax({
-            url: "https://app6621.acapp.acwing.com.cn/settings/logout/",
-            type: "GET",
-            success: function(resp) {
-                if (resp.result === "success") {
-                    location.reload();
+            this.root.acos.api.window.close();
+        } else {
+            let that = this;
+            $.ajax({
+                url: "https://app6621.acapp.acwing.com.cn/settings/logout/",
+                type: "GET",
+                success: function(resp) {
+                    if (resp.result === "success") {
+                        location.reload();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     register_on_remote() {

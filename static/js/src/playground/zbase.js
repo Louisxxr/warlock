@@ -37,6 +37,12 @@ class Playground {
         this.height = this.$playground.height();
         this.width = this.$playground.width();
         this.map = new GameMap(this);
+
+        this.mode = mode;
+        this.state = "waiting"; // 多人模式可用，waiting -> fighting -> gameover
+        this.player_count = 0;
+        this.notice_board = new NoticeBoard(this);
+        
         this.resize();
         this.players = [];
         this.players.push(new GamePlayer(this, this.width / 2 / this.scale, 0.5, 0.05, "white", 0.2, "me", this.root.settings.username, this.root.settings.photo));

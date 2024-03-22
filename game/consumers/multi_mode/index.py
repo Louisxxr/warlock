@@ -32,7 +32,6 @@ class MultiPlayer(AsyncWebsocketConsumer):
                 await self.channel_layer.group_add(self.room_name, self.channel_name)
 
         async def disconnect(self, close_code):
-                print('disconnect')
                 await self.channel_layer.group_discard(self.room_name, self.channel_name)
 
         async def receive(self, text_data):
@@ -41,6 +40,14 @@ class MultiPlayer(AsyncWebsocketConsumer):
                 event = data["event"]
                 if event == "create_player":
                         await self.create_player(data)
+                elif event == "move_to":
+                        await self.move_to(data)
+                elif event == "shoot_fireball":
+                        await self.shoot_fireball(data)
+                elif event == "attack":
+                        await self.attack(data)
+                elif event == "flash":
+                        await self.flash(data)
 
         async def create_player(self, data):
                 players = cache.get(self.room_name)
@@ -52,12 +59,53 @@ class MultiPlayer(AsyncWebsocketConsumer):
                 cache.set(self.room_name, players, 3600)
 
                 await self.channel_layer.group_send(self.room_name, {
-                        "type": "group_create_player",
+                        "type": "group_send_event",
                         "event": "create_player",
                         "uuid": data["uuid"],
                         "username": data["username"],
                         "photo": data["photo"]
                 })
 
-        async def group_create_player(self, data):
+        async def move_to(self, data):
+                await self.channel_layer.group_send(self.room_name, {
+                        "type": "group_send_event",
+                        "event": "move_to",
+                        "uuid": data["uuid"],
+                        "tx": data["tx"],
+                        "ty": data["ty"]
+                })
+
+        async def shoot_fireball(self, data):
+                await self.channel_layer.group_send(self.room_name, {
+                        "type": "group_send_event",
+                        "event": "shoot_fireball",
+                        "uuid": data["uuid"],
+                        "tx": data["tx"],
+                        "ty": data["ty"],
+                        "fireball_uuid": data["fireball_uuid"]
+                })
+
+        async def attack(self, data):
+                await self.channel_layer.group_send(self.room_name, {
+                        "type": "group_send_event",
+                        "event": "attack",
+                        "uuid": data["uuid"],
+                        "victim_uuid": data["victim_uuid"],
+                        "x": data["x"],
+                        "y": data["y"],
+                        "angle": data["angle"],
+                        "damage": data["damage"],
+                        "fireball_uuid": data["fireball_uuid"]
+                })
+
+        async def flash(self, data):
+                await self.channel_layer.group_send(self.room_name, {
+                        "type": "group_send_event",
+                        "event": "flash",
+                        "uuid": data["uuid"],
+                        "tx": data["tx"],
+                        "ty": data["ty"]
+                })
+
+        async def group_send_event(self, data):
                 await self.send(text_data = json.dumps(data))
