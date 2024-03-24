@@ -33,7 +33,7 @@ class ChatBox {
                 if (text) {
                     that.$input.val("");
                     that.add_message(username, text);
-                    that.playground.socket.send_message(text);
+                    that.playground.socket.send_message(username, text);
                 }
                 return false;
             }
