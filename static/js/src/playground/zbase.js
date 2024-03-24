@@ -52,6 +52,7 @@ class Playground {
                 this.players.push(new GamePlayer(this, this.width / 2 / this.scale, 0.5, 0.05, this.get_random_color(), 0.2, "robot"));
             }
         } else if (mode === "multi_mode") {
+            this.chatbox = new ChatBox(this);
             this.socket = new MultiPlayerSocket(this);
             this.socket.uuid = this.players[0].id;
             this.socket.ws.onopen = function() {

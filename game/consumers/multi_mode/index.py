@@ -48,6 +48,8 @@ class MultiPlayer(AsyncWebsocketConsumer):
                         await self.attack(data)
                 elif event == "flash":
                         await self.flash(data)
+                elif event == "message":
+                        await self.message(data)
 
         async def create_player(self, data):
                 players = cache.get(self.room_name)
@@ -105,6 +107,14 @@ class MultiPlayer(AsyncWebsocketConsumer):
                         "uuid": data["uuid"],
                         "tx": data["tx"],
                         "ty": data["ty"]
+                })
+
+        async def message(self, data):
+                await self.channel_layer.group_send(self.room_name, {
+                        "type": "group_send_event",
+                        "event": "message",
+                        "uuid": data["uuid"],
+                        "text": data["text"]
                 })
 
         async def group_send_event(self, data):

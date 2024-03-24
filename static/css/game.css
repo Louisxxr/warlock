@@ -162,3 +162,40 @@
     border-radius: 5px;
     cursor: pointer;
 }
+
+.game-chat-box-history {
+    position: absolute;
+    top: 60%;
+    left: 20%;
+    
+    transform: translate(-50%, -50%);
+
+    height: 30%;
+    width: 20%;
+
+    color: white;
+    font-size: 2vh;
+
+    padding: 5px;
+    overflow: auto;
+}
+
+.game-chat-box-history::-webkit-scrollbar {
+    width: 0;
+}
+
+.game-chat-box-input {
+    position: absolute;
+    top: 85%;
+    left: 20%;
+
+    transform: translate(-50%, -50%);
+
+    height: 3vh;
+    width: 20%;
+
+    color: white;
+    font-size: 2vh;
+
+    background-color: rgba(222, 225, 230, 0.2);
+}

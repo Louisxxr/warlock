@@ -62,9 +62,10 @@ class GamePlayer extends GameObject {
 
     add_listening_events() {
         let that = this;
+        
         this.playground.map.$canvas.mousedown(function(e) {
             if (that.playground.state !== "fighting") {
-                return false;
+                return true;
             }
 
             const rect = that.context.canvas.getBoundingClientRect();
@@ -105,7 +106,19 @@ class GamePlayer extends GameObject {
             }
         });
 
-        $(window).keydown(function(e) {
+        this.playground.map.$canvas.keydown(function(e) {
+            if (e.which === 13) { // Enter 键
+                if (that.playground.mode === "multi_mode") {
+                    that.playground.chatbox.show_input();
+                    return false;
+                }
+            } else if (e.which === 27) {
+                if (that.playground.mode === "multi_mode") {
+                    that.playground.chatbox.hide_input();
+                    return false;
+                }
+            }
+
             if (that.playground.state !== "fighting") {
                 return true;
             }

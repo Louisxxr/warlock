@@ -2,7 +2,7 @@ class GameMap extends GameObject {
     constructor(playground) {
         super();
         this.playground = playground;
-        this.$canvas = $(`<canvas></canvas>`);
+        this.$canvas = $(`<canvas tabindex=0></canvas>`);
         this.context = this.$canvas[0].getContext('2d');
         this.context.canvas.height = this.playground.height;
         this.context.canvas.width = this.playground.width;
@@ -10,9 +10,11 @@ class GameMap extends GameObject {
     }
 
     start() {
-        this.$canvas.on("contextmenu", function() {
-            return false;
-        });
+        // this.$canvas.on("contextmenu", function() {
+        //     return false;
+        // });
+
+        this.$canvas.focus();
     }
 
     resize() {
