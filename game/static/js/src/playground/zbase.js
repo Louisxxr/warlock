@@ -11,11 +11,27 @@ class Playground {
         this.start();
     }
 
+    create_id() {
+        let id = ""
+        for (let i = 0; i < 8; i++) {
+            let x = parseInt(Math.floor(Math.random() * 10));
+            id += x;
+        }
+        return id;
+    }
+
     start() {
         let that = this;
-        $(window).resize(function() {
+        let id = this.create_id();
+        $(window).on(`resize.${id}`, function() {
             that.resize();
         });
+
+        if (this.root.acos) {
+            this.root.acos.api.window.on_close(function() {
+                $(window).off(`resize.${id}`);
+            });
+        }
     }
 
     resize() {
@@ -42,6 +58,8 @@ class Playground {
         this.state = "waiting"; // 多人模式可用，waiting -> fighting -> gameover
         this.player_count = 0;
         this.notice_board = new NoticeBoard(this);
+
+        this.score_board = new ScoreBoard(this);
         
         this.resize();
         this.players = [];
@@ -62,6 +80,27 @@ class Playground {
     }
 
     hide() { // 隐藏 playground 界面
+        while (this.players && this.players.length > 0) {
+            this.players[0].destroy();
+        }
+
+        if (this.map) {
+            this.map.destroy();
+            this.map = null;
+        }
+
+        if (this.notice_board) {
+            this.notice_board.destroy();
+            this.notice_board = null;
+        }
+
+        if (this.score_board) {
+            this.score_board.destroy();
+            this.score_board = null;
+        }
+
+        this.$playground.empty();
+
         this.$playground.hide();
     }
 

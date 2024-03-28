@@ -197,12 +197,23 @@ class GamePlayer extends GameObject {
     update() {
         this.protection_time += this.time_diff / 1000;
 
+        this.update_win();
+
         if (this.character === "me" && this.playground.state === "fighting") {
             this.update_coldtime();
         }
+
         this.update_move();
 
         this.render();
+    }
+
+    update_win() {
+        // 只能在 fighting 状态下
+        if (this.playground.state === "fighting" && this.character === "me" && this.playground.players.length === 1) {
+            this.playground.state = "gameover";
+            this.playground.score_board.win();
+        }
     }
 
     update_coldtime() {
@@ -341,8 +352,9 @@ class GamePlayer extends GameObject {
     }
 
     on_destroy() {
-        if (this.character === "me") {
+        if (this.playground.state === "fighting" && this.character === "me") {
             this.playground.state = "gameover";
+            this.playground.score_board.lose();
         }
 
         for (let i = 0; i < this.playground.players.length; i++) {

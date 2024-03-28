@@ -25,6 +25,10 @@ class GameObject {
     update() { // 在每一帧都执行
     }
 
+    late_update() { // 在每一帧的最后执行一次
+
+    }
+
     render() { // 渲染
     }
 
@@ -56,6 +60,12 @@ let GAME_ANIMATION = function(timestamp) {
             obj.update();
         }
     }
+
+    for (let i = 0; i < GAME_OBJECTS.length; i++) {
+        let obj = GAME_OBJECTS[i];
+        obj.late_update();
+    }
+
     last_timestamp = timestamp;
     requestAnimationFrame(GAME_ANIMATION);
 }

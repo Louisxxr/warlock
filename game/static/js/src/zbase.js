@@ -7,6 +7,12 @@ export class Game {
         this.menu = new Menu(this);
         this.playground = new Playground(this);
 
+        if (!acos) {
+            document.oncontextmenu = function() {
+                return false;
+            }
+        }
+
         this.start();
     }
 
