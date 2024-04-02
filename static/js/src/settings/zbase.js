@@ -107,11 +107,45 @@ class Settings {
 
     start() {
         if (this.platform === "web") {
-            this.getinfo_web();
+            if (this.root.access) {
+                this.getinfo_web();
+                this.refresh_jwt_token();
+            } else {
+                this.login();
+            }
             this.add_listening_events();
         } else {
             this.getinfo_acapp();
         }
+    }
+
+    refresh_jwt_token() {
+        setInterval(() => {
+            $.ajax({
+                url: "https://app6621.acapp.acwing.com.cn/settings/token/refresh/",
+                type: "POST",
+                data: {
+                    refresh: this.root.refresh
+                },
+                success: resp => {
+                    this.root.access = resp.access;
+                }
+            })
+        }, 270000);
+
+        // 查看排行榜，暂时放在这个函数里
+        setTimeout(() => {
+            $.ajax({
+                url: "https://app6621.acapp.acwing.com.cn/settings/ranklist/",
+                type: "GET",
+                headers: {
+                    'Authorization': "Bearer " + this.root.access
+                },
+                success: resp => {
+                    console.log(resp);
+                }
+            })
+        }, 5000);
     }
 
     add_listening_events() {
@@ -149,8 +183,8 @@ class Settings {
         $.ajax({
             url: "https://app6621.acapp.acwing.com.cn/settings/getinfo/",
             type: "GET",
-            data: {
-                platform: that.platform,
+            headers: {
+                'Authorization': "Bearer " + that.root.access
             },
             success: function(resp) {
                 if (resp.result === "success") {
@@ -182,10 +216,13 @@ class Settings {
         let that = this;
         this.root.acos.api.oauth2.authorize(appid, redirect_uri, scope, state, function(resp) {
             if (resp.result === "success") {
-                that.username = resp.username,
-                that.photo = resp.photo,
+                that.username = resp.username;
+                that.photo = resp.photo;
                 that.hide();
                 that.root.menu.show();
+                that.root.access = resp.access;
+                that.root.refresh = resp.refresh;
+                that.refresh_jwt_token();
             }
         });
     }
@@ -208,25 +245,27 @@ class Settings {
         this.$register.show();
     }
 
-    login_on_remote() {
-        let username = this.$login_username.val();
-        let password = this.$login_password.val();
+    login_on_remote(username, password) {
+        username = username || this.$login_username.val();
+        password = password || this.$login_password.val();
         this.$login_errormessages.empty();
 
         let that = this;
         $.ajax({
-            url: "https://app6621.acapp.acwing.com.cn/settings/login/",
-            type: "GET",
+            url: "https://app6621.acapp.acwing.com.cn/settings/token/",
+            type: "POST",
             data: {
                 username: username,
                 password: password,
             },
             success: function(resp) {
-                if (resp.result === "success") {
-                    location.reload(); // 刷新
-                } else {
-                    that.$login_errormessages.html(resp.result);
-                }
+                that.root.access = resp.access;
+                that.root.refresh = resp.refresh;
+                that.refresh_jwt_token();
+                that.getinfo_web();
+            },
+            error: () => {
+                that.$login_errormessages.html("用户名或密码不正确");
             }
         });
     }
@@ -235,16 +274,9 @@ class Settings {
         if (this.platform === "acapp") {
             this.root.acos.api.window.close();
         } else {
-            let that = this;
-            $.ajax({
-                url: "https://app6621.acapp.acwing.com.cn/settings/logout/",
-                type: "GET",
-                success: function(resp) {
-                    if (resp.result === "success") {
-                        location.reload();
-                    }
-                }
-            });
+            this.root.access = "";
+            this.root.refresh = "";
+            location.href = "/";
         }
     }
 
@@ -254,23 +286,22 @@ class Settings {
         let password_confirm = this.$register_password_confirm.val();
         this.$register_errormessages.empty();
 
-        let that = this;
         $.ajax({
             url: "https://app6621.acapp.acwing.com.cn/settings/register/",
-            type: "GET",
+            type: "POST",
             data: {
                 username: username,
                 password: password,
-                password_confirm: password_confirm,
+                password_confirm: password_confirm
             },
-            success: function(resp) {
+            success: resp => {
                 if (resp.result === "success") {
-                    location.reload();
+                    this.login_on_remote(username, password);
                 } else {
-                    that.$register_errormessages.html(resp.result);
+                    this.$register_errormessages.html(resp.result);
                 }
             }
-        })
+        });
     }
 
     acwing_login() {

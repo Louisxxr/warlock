@@ -1,7 +1,9 @@
 export class Game {
-    constructor(id, acos) {
+    constructor(id, acos, access, refresh) {
         this.id = id;
         this.acos = acos;
+        this.access = access;
+        this.refresh = refresh;
         this.$game = $('#' + id);
         this.settings = new Settings(this);
         this.menu = new Menu(this);

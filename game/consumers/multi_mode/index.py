@@ -13,6 +13,8 @@ from channels.db import database_sync_to_async
 
 class MultiPlayer(AsyncWebsocketConsumer):
         async def connect(self):
+                user = self.scope['user']
+
                 # self.room_name = None
 
                 # for i in range(1000):
@@ -24,7 +26,10 @@ class MultiPlayer(AsyncWebsocketConsumer):
                 # if not self.room_name:
                 #         return
                 
-                await self.accept()
+                if user.is_authenticated:
+                        await self.accept()
+                else:
+                        await self.close()
 
                 # if not cache.has_key(self.room_name):
                 #         cache.set(self.room_name, [], 3600) # 有效期：1h
@@ -40,7 +45,7 @@ class MultiPlayer(AsyncWebsocketConsumer):
                 # await self.channel_layer.group_add(self.room_name, self.channel_name)
 
         async def disconnect(self, close_code):
-                if self.room_name:
+                if hasattr(self, 'room_name') and self.room_name:
                         await self.channel_layer.group_discard(self.room_name, self.channel_name)
 
         async def receive(self, text_data):
